@@ -1,4 +1,18 @@
-# Agentic Financial QA API
+<p align="center">
+  <img src="assets/readme-banner.svg" alt="Agentic Financial QA API" width="100%">
+</p>
+
+<p align="center">
+  <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="api" src="https://img.shields.io/badge/api-fastapi-009688?logo=fastapi&logoColor=white">
+  <img alt="workflow" src="https://img.shields.io/badge/workflow-langgraph-22c55e">
+</p>
+
+<p align="center">
+  <a href="#local-setup">Local setup</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#review-guide">Review guide</a>
+</p>
 
 FastAPI service for answering financial questions over mixed text and table inputs. The system uses a LangGraph workflow to decompose financial QA into planning, data extraction, calculation, and answer generation, while preserving intermediate steps for traceability.
 
@@ -25,6 +39,12 @@ Financial QA is a useful test bed for applied LLM systems because the answer is 
 - evaluate outputs with numeric-aware metrics rather than only string matching.
 
 This repository demonstrates that workflow as an API-backed agentic system.
+
+## Architecture
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="Agentic Financial QA API architecture" width="100%">
+</p>
 
 ## Core Workflow
 
