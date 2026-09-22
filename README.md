@@ -1,3 +1,5 @@
+# Agentic Financial QA API
+
 <p align="center">
   <img src="assets/readme-banner.svg" alt="Agentic Financial QA API" width="100%">
 </p>
@@ -26,7 +28,6 @@ This project is based on ConvFinQA-style tasks: questions often require locating
 | Agent workflow | LangGraph stages for planning, extraction, calculation, and final response generation. |
 | API layer | FastAPI endpoint with typed Pydantic request/response contracts. |
 | Evaluation | Batch runner with exact-match, numeric precision, and scale-aware tolerance metrics. |
-| FDE relevance | Converts an ambiguous domain workflow into an inspectable, API-backed system with clear failure surfaces. |
 
 ## Why This Project
 
@@ -42,9 +43,24 @@ This repository demonstrates that workflow as an API-backed agentic system.
 
 ## Architecture
 
-<p align="center">
-  <img src="assets/architecture.svg" alt="Agentic Financial QA API architecture" width="100%">
-</p>
+```mermaid
+flowchart TD
+  Q["POST /financial-qa/questions"] --> S["FinQAState · question + text + table"]
+  S --> P["create_solution_plan · LLM"]
+  P --> X["extract_data · LLM"]
+  X --> C["perform_calculations · restricted expressions"]
+  C --> A["generate_answer"]
+  A --> O["answer + variables + steps"]
+  P -->|error| E["End workflow with error"]
+  X -->|error| E
+  C -->|error| E
+  V["Batch evaluation · ConvFinQA examples"] -.-> Q
+  O -.-> N["Exact / numeric / scale-aware comparison"]
+  classDef core fill:#dcfce7,stroke:#16a34a,color:#14532d;
+  classDef err fill:#fee2e2,stroke:#dc2626,color:#7f1d1d;
+  class P,X,C,A core;
+  class E err;
+```
 
 ## Core Workflow
 
@@ -238,8 +254,11 @@ Generated evaluation output is intentionally ignored by git so the repository st
     └── test_api.py                   Basic API tests
 ```
 
-## Portfolio Positioning
 
-This is a prototype for agentic financial reasoning, not a production financial-advice system. The strongest signals are the workflow decomposition, typed state management, traceable intermediate steps, API packaging, and evaluation discipline around numeric answers.
+## Integration and limits
 
-For FDE-style work, the relevant takeaway is the ability to translate an ambiguous domain problem into a working technical system: define the state model, split the workflow into inspectable stages, expose it through an API, and build evaluation hooks for iterative improvement.
+Any HTTP client can submit a question, table, and surrounding text to `POST /financial-qa/questions`. Consume `answer` for display and retain `steps` and `variables` for inspection. The response above illustrates the shape; model-generated plans and traces can vary.
+
+Change `FINQA_OPENAI_MODEL` to select a compatible model. To adapt the workflow to another numeric domain, update the planning/extraction prompts and validate representative examples with the batch evaluator. Modify the Pydantic API models when the input contract changes.
+
+The service expects supplied text and tables: it does not ingest PDFs or connect to a financial database. Restricted expression evaluation is not a hardened sandbox, and executable arithmetic does not prove that the model selected the correct values or formula.
